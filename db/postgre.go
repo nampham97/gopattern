@@ -3,13 +3,13 @@ package db
 
 import (
 	"GoPattern/config"
-	"database/sql"
 	"fmt"
 
+	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
 
-var db *sql.DB
+var db *sqlx.DB
 
 func InitDB(cfg config.Config) error {
 	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
@@ -17,7 +17,7 @@ func InitDB(cfg config.Config) error {
 	)
 
 	var err error
-	db, err = sql.Open("postgres", connStr)
+	db, err = sqlx.Open("postgres", connStr)
 	if err != nil {
 		return fmt.Errorf("failed to open DB: %w", err)
 	}
@@ -31,6 +31,9 @@ func InitDB(cfg config.Config) error {
 	return nil
 }
 
-func GetDB() *sql.DB {
+func GetDB() *sqlx.DB {
+	if db == nil {
+		panic("Database connection is not initialized. Call InitDB first.")
+	}
 	return db
 }
